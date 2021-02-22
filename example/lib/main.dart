@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
-import 'package:flutter/services.dart';
-import 'package:authority/authority.dart';
+import 'view.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,14 +20,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Authority'),
-        ),
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+      home: HomeView(),
     );
   }
 }

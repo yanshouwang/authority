@@ -15,14 +15,19 @@ import io.flutter.plugin.common.PluginRegistry
 
 /** AuthorityPlugin */
 class AuthorityPlugin : FlutterPlugin, ActivityAware, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
+    companion object {
+        private const val REQUEST_CODE = 1993
+    }
+
     private lateinit var activityPluginBinding: ActivityPluginBinding
     private lateinit var method: MethodChannel
 
-    private val results: MutableMap<Int, Result> = mutableMapOf()
+    private var result: Result? = null
+
     private val activity get() = activityPluginBinding.activity
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        method = MethodChannel(flutterPluginBinding.binaryMessenger, "authority")
+        method = MethodChannel(flutterPluginBinding.binaryMessenger, "yanshouwang.dev/authority/method")
         method.setMethodCallHandler(this)
     }
 
@@ -56,13 +61,13 @@ class AuthorityPlugin : FlutterPlugin, ActivityAware, MethodCallHandler, PluginR
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
-        val result = results.remove(requestCode)
-        if (result == null) {
-            return false
-        } else {
+        if (requestCode == REQUEST_CODE && result != null) {
             val value = grantResults!!.all { item -> item == PackageManager.PERMISSION_GRANTED }
-            result.success(value)
+            result!!.success(value)
+            result = null
             return true
+        } else {
+            return false
         }
     }
 
@@ -72,13 +77,12 @@ class AuthorityPlugin : FlutterPlugin, ActivityAware, MethodCallHandler, PluginR
     }
 
     private fun requestNative(call: MethodCall, result: Result) {
-        for (requestCode in 0..0xffff) {
-            if (!results.containsKey(requestCode)) {
-                results[requestCode] = result
-                ActivityCompat.requestPermissions(activity, call.permissions, requestCode)
-                return
-            }
+        // ANDROID DOESN'T SUPPORT MULTI REQUESTS AT THE SAME TIME.
+        if (this.result != null) {
+            result.success(false)
+        } else {
+            this.result = result
+            ActivityCompat.requestPermissions(activity, call.permissions, REQUEST_CODE)
         }
-        result.error("TOO MANY REQUESTS", null, null)
     }
 }
