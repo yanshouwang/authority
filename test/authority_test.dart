@@ -1,23 +1,37 @@
+import 'package:authority/src/messenger.dart' as messenger;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:authority/authority.dart';
 
 void main() {
-  const MethodChannel channel = MethodChannel('authority');
+  final method = MethodChannel(messenger.method.name);
 
   TestWidgetsFlutterBinding.ensureInitialized();
 
+  final calls = <MethodCall>[];
+
   setUp(() {
-    channel.setMockMethodCallHandler((MethodCall methodCall) async {
-      return '42';
+    method.setMockMethodCallHandler((call) async {
+      calls.add(call);
+      return false;
     });
   });
 
   tearDown(() {
-    channel.setMockMethodCallHandler(null);
+    method.setMockMethodCallHandler(null);
+    calls.clear();
   });
 
-  test('getPlatformVersion', () async {
-    expect(await Authority.platformVersion, '42');
-  });
+  for (var authority in Authority.values) {
+    test('check $authority.', () async {
+      final actual = await authority.checkAsync();
+      expect(actual, false);
+      expect(calls, [isMethodCall('check', arguments: authority.index)]);
+    });
+    test('request $authority.', () async {
+      final actual = await authority.requestAsync();
+      expect(actual, false);
+      expect(calls, [isMethodCall('request', arguments: authority.index)]);
+    });
+  }
 }
