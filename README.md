@@ -1,15 +1,26 @@
-# authority
+# Authority
 
-A new flutter plugin project.
+An authority plugin for flutter, support check, request and openAppSettings on Android an iOS.
+
+## Features
+
+- checkAsync(Authority authority)
+- requestAsync(Authority authority)
+- openAppSettingsAsync()
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+Add `authority` as a [dependency in your pubspec.yaml file](https://flutter.dev/using-packages/).
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```
+dependencies:
+  authority: ^<latest-version>
+```
 
+### Android
+
+Add the authority's [corresponding permissions](example/android/app/src/main/AndroidManifest.xml) to the `AndroidManifest.xml`.
+
+### iOS
+
+Add the authority's [corresponding descriptions](example/ios/Runner/Info.plist) to the `Info.plist`.

@@ -1,8 +1,8 @@
 name: authority
-description: A new flutter plugin project.
+description: An authority plugin for flutter, support check and request authority on Android an iOS.
 version: 0.0.1
-author:
-homepage:
+homepage: https://github.com/yanshouwang/authority
+publish_to: https://pub.dev
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -15,6 +15,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pedantic: ^1.9.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

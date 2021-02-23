@@ -1,3 +1,5 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+- Add checkAsync(Authority authority).
+- Add requestAsync(Authority authority).
+- Add openAppSettingsAsync().

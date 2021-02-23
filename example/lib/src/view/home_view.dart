@@ -30,26 +30,23 @@ class _HomeViewState extends State<HomeView> {
   void check() async {
     final value = await checkAsync(Authority.camera);
     await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('CHECK RESULT'),
-            content: Text('$value'),
-          );
-        });
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('CHECK RESULT'),
+        content: Text('$value'),
+      ),
+    );
   }
 
   void request() async {
     final value = await requestAsync(Authority.camera);
     await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('CHECK RESULT'),
-            content: Text('$value'),
-          );
-        });
-    print(value);
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('CHECK RESULT'),
+        content: Text('$value'),
+      ),
+    );
   }
 
   void openAppSettings() async {
