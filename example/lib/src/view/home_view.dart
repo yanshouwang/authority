@@ -18,14 +18,9 @@ class _HomeViewState extends State<HomeView> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            FlatButton(
-              child: Text('CHECK'),
-              onPressed: check,
-            ),
-            FlatButton(
-              child: Text('REQUEST'),
-              onPressed: request,
-            ),
+            FlatButton(child: Text('CHECK'), onPressed: check),
+            FlatButton(child: Text('REQUEST'), onPressed: request),
+            FlatButton(child: Text('APP SETTINGS'), onPressed: openAppSettings),
           ],
         ),
       ),
@@ -33,7 +28,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void check() async {
-    final value = await Authority.camera.checkAsync();
+    final value = await checkAsync(Authority.camera);
     await showDialog(
         context: context,
         builder: (context) {
@@ -45,7 +40,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   void request() async {
-    final value = await Authority.camera.requestAsync();
+    final value = await requestAsync(Authority.camera);
     await showDialog(
         context: context,
         builder: (context) {
@@ -55,5 +50,9 @@ class _HomeViewState extends State<HomeView> {
           );
         });
     print(value);
+  }
+
+  void openAppSettings() async {
+    await openAppSettingsAsync();
   }
 }

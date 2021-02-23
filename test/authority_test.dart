@@ -13,7 +13,14 @@ void main() {
   setUp(() {
     method.setMockMethodCallHandler((call) async {
       calls.add(call);
-      return false;
+      switch (call.method) {
+        case 'check':
+          return false;
+        case 'request':
+          return true;
+        default:
+          return null;
+      }
     });
   });
 
@@ -24,14 +31,20 @@ void main() {
 
   for (var authority in Authority.values) {
     test('check $authority.', () async {
-      final actual = await authority.checkAsync();
+      final actual = await checkAsync(authority);
       expect(actual, false);
       expect(calls, [isMethodCall('check', arguments: authority.index)]);
     });
+
     test('request $authority.', () async {
-      final actual = await authority.requestAsync();
-      expect(actual, false);
+      final actual = await requestAsync(authority);
+      expect(actual, true);
       expect(calls, [isMethodCall('request', arguments: authority.index)]);
     });
   }
+
+  test('openAppSettings', () async {
+    await openAppSettingsAsync();
+    expect(calls, [isMethodCall('openAppSettings', arguments: null)]);
+  });
 }

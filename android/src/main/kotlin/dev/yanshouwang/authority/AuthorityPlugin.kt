@@ -1,6 +1,8 @@
 package dev.yanshouwang.authority
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import androidx.annotation.NonNull
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -22,7 +24,7 @@ class AuthorityPlugin : FlutterPlugin, ActivityAware, MethodCallHandler, PluginR
     private lateinit var activityPluginBinding: ActivityPluginBinding
     private lateinit var method: MethodChannel
 
-    private var result: Result? = null
+    private var waiter: Result? = null
 
     private val activity get() = activityPluginBinding.activity
 
@@ -56,33 +58,44 @@ class AuthorityPlugin : FlutterPlugin, ActivityAware, MethodCallHandler, PluginR
         when (call.method) {
             "check" -> checkNative(call, result)
             "request" -> requestNative(call, result)
+            "openAppSettings" -> openAppSettingsNative(result)
             else -> result.notImplemented()
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>?, grantResults: IntArray?): Boolean {
-        if (requestCode == REQUEST_CODE && result != null) {
-            val value = grantResults!!.all { item -> item == PackageManager.PERMISSION_GRANTED }
-            result!!.success(value)
-            result = null
-            return true
+        return if (requestCode == REQUEST_CODE && waiter != null) {
+            val value = grantResults!!.all { result -> result == PackageManager.PERMISSION_GRANTED }
+            waiter!!.success(value)
+            waiter = null
+            true
         } else {
-            return false
+            false
         }
     }
 
     private fun checkNative(call: MethodCall, result: Result) {
-        val value = call.permissions.all { item -> ContextCompat.checkSelfPermission(activity, item) == PackageManager.PERMISSION_GRANTED }
+        // ActivityCompat.shouldShowRequestPermissionRationale() always returns false before user make a choice.
+        val value = call.permissions.all { permission -> ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED }
         result.success(value)
     }
 
     private fun requestNative(call: MethodCall, result: Result) {
-        // ANDROID DOESN'T SUPPORT MULTI REQUESTS AT THE SAME TIME.
-        if (this.result != null) {
-            result.success(false)
+        if (waiter != null) {
+            result.error("AUTHORITY", "Can't make multi requests at the same time.", null)
         } else {
-            this.result = result
+            waiter = result
             ActivityCompat.requestPermissions(activity, call.permissions, REQUEST_CODE)
         }
+    }
+
+    private fun openAppSettingsNative(result: Result) {
+        val uri = Uri.parse("package:${activity.packageName}")
+        val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, uri)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
+        intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+        activity.startActivity(intent)
+        result.success(null)
     }
 }
